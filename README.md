@@ -264,3 +264,7 @@ MIT
 - Basic log generation with colorization
 - Infinite mode support
 - Adjustable timing
+
+## Credits
+
+Inspired by [flog](https://github.com/mingrammer/flog/).
