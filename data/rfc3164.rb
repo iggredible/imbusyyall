@@ -201,36 +201,36 @@ module DataSources
         facility_name = FACILITIES[facility_num]
         severity_num = weighted_severity
         severity_name = SEVERITIES[severity_num]
-        
+
         # Calculate priority (facility * 8 + severity)
         priority = facility_num * 8 + severity_num
-        
+
         # Generate timestamp (RFC3164 uses Mmm dd hh:mm:ss format)
         timestamp = Time.now.strftime('%b %e %H:%M:%S').gsub('  ', ' ')
-        
+
         # Get hostname
         hostname = HOSTNAMES.sample
-        
+
         # Get process name and PID
         process_names = PROCESS_NAMES[facility_name] || ['process']
         process = process_names.sample
         pid = rand(100..65535)
-        
+
         # Get appropriate message
         messages = MESSAGES[facility_name] || MESSAGES['daemon']
         message_template = messages.sample
         message = fill_message_template(message_template, facility_name)
-        
+
         # Apply color to severity
         severity_color = SEVERITY_COLORS[severity_name]
-        
+
         # Format: <priority>timestamp hostname process[pid]: message
         # Using traditional syslog format with colors for readability
         "#{Colors::GRAY}<#{priority}>#{Colors::RESET}#{timestamp} #{Colors::CYAN}#{hostname}#{Colors::RESET} #{Colors::YELLOW}#{process}[#{pid}]#{Colors::RESET}: #{severity_color}#{message}#{Colors::RESET}"
       end
-      
+
       private
-      
+
       def weighted_severity
         # Weight towards info/notice with occasional warnings and rare errors
         weights = {
@@ -243,22 +243,22 @@ module DataSources
           6 => 0.40,  # info
           7 => 0.10   # debug
         }
-        
+
         rand_val = rand
         cumulative = 0
-        
+
         weights.each do |severity, weight|
           cumulative += weight
           return severity if rand_val <= cumulative
         end
-        
+
         6 # default to info
       end
-      
+
       def fill_message_template(template, facility)
         # Return template as-is if it has no format specifiers
         return template unless template.include?('%')
-        
+
         begin
           replacements = case facility
         when 'kern'
@@ -285,7 +285,7 @@ module DataSources
           when /pam_unix\(sshd:session\)/
             [%w[root admin deploy jenkins gitlab runner postgres mysql].sample, rand(0..1000)]
           when /pam_unix\(sudo:session\)/
-            [%w[root admin deploy jenkins gitlab runner postgres mysql].sample, 
+            [%w[root admin deploy jenkins gitlab runner postgres mysql].sample,
              %w[root sudo cron].sample, rand(0..1000)]
           when /session opened for user (?!.*by \()/
             [%w[root admin deploy jenkins gitlab runner postgres mysql].sample, LogUtils.ip_address]
@@ -317,7 +317,7 @@ module DataSources
             ["user#{rand(100..999)}@example.com", rand(1000..1000000), rand(1..5)]
           when /to=<.*relay=/
             ["recipient#{rand(100..999)}@example.com", "mail.example.com", LogUtils.ip_address,
-             25, "#{rand(0..5)}.#{rand(0..999)}", 
+             25, "#{rand(0..5)}.#{rand(0..999)}",
              "#{rand(0..2)}.#{rand(0..999)}/#{rand(0..2)}.#{rand(0..999)}/#{rand(0..2)}.#{rand(0..999)}/#{rand(0..2)}.#{rand(0..999)}",
              "2.0.0", "sent (250 2.0.0 OK)"]
           when /connect from/
@@ -366,7 +366,7 @@ module DataSources
             rand < 0.5 ? rand(1..1000) : %w[active inactive running stopped failed].sample
           end
         end
-        
+
           # Apply replacements if any exist
           if replacements && !replacements.empty?
             template % replacements
@@ -378,7 +378,7 @@ module DataSources
           "#{facility} message (format error)"
         end
       end
-      
+
       def generate_mac
         6.times.map { '%02x' % rand(256) }.join(':')
       end

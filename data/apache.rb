@@ -152,13 +152,13 @@ module DataSources
         # Weighted random selection based on realistic distribution
         total = HTTP_METHODS.values.sum
         random = rand(total)
-        
+
         cumulative = 0
         HTTP_METHODS.each do |method, weight|
           cumulative += weight
           return method if random < cumulative
         end
-        
+
         'GET' # fallback
       end
 
@@ -166,13 +166,13 @@ module DataSources
         # Weighted random selection based on realistic distribution
         total = STATUS_CODES.values.sum { |v| v[:weight] }
         random = rand(total)
-        
+
         cumulative = 0
         STATUS_CODES.each do |code, data|
           cumulative += data[:weight]
           return code if random < cumulative
         end
-        
+
         200 # fallback
       end
 
@@ -241,7 +241,7 @@ module DataSources
       def generate_access_log
         # Common Log Format: host ident authuser timestamp "request" status size
         # Combined Log Format adds: "referer" "user-agent"
-        
+
         ip = LogUtils.ip_address
         ident = '-' # Usually not used
         authuser = rand < 0.05 ? "user#{rand(100)}" : '-' # 5% chance of authenticated user
@@ -253,7 +253,7 @@ module DataSources
         size = response_size
         referer = referrer
         user_agent = self.user_agent
-        
+
         # Color the different parts
         status_color = status_color(status)
         method_color = case method
@@ -263,7 +263,7 @@ module DataSources
                        when 'DELETE' then Colors::RED
                        else Colors::GRAY
                        end
-        
+
         "#{Colors::CYAN}#{ip}#{Colors::RESET} #{ident} #{authuser} " \
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "\"#{method_color}#{method}#{Colors::RESET} #{path} #{protocol}\" " \
@@ -274,14 +274,13 @@ module DataSources
 
       def generate_error_log
         # Apache Error Log Format: [timestamp] [level] [pid] [client IP] message
-        
+
         timestamp = generate_apache_timestamp
         level_key = error_type
         level_data = ERROR_TYPES[level_key]
         pid = rand(1000..9999)
-        client_ip = LogUtils.ip_address
         message = error_message
-        
+
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "#{level_data[:color]}#{level_data[:label]}#{Colors::RESET} " \
         "#{Colors::GRAY}[pid #{pid}]#{Colors::RESET} " \
@@ -303,7 +302,7 @@ module DataSources
       def generate_ssl_log
         timestamp = generate_apache_timestamp
         client_ip = LogUtils.ip_address
-        
+
         ssl_messages = [
           "SSL handshake successful",
           "SSL handshake failed: certificate verify failed",
@@ -311,7 +310,7 @@ module DataSources
           "SSL renegotiation failed",
           "SSL certificate expired"
         ]
-        
+
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "#{Colors::YELLOW}[ssl:info]#{Colors::RESET} " \
         "#{Colors::GRAY}[pid #{rand(1000..9999)}]#{Colors::RESET} " \
@@ -322,7 +321,7 @@ module DataSources
       def generate_module_log
         timestamp = generate_apache_timestamp
         module_name = apache_module
-        
+
         module_messages = [
           "#{module_name} loaded successfully",
           "#{module_name} configuration updated",
@@ -330,7 +329,7 @@ module DataSources
           "#{module_name} cache hit for #{resource}",
           "#{module_name} processing request"
         ]
-        
+
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "#{Colors::BLUE}[#{module_name}:info]#{Colors::RESET} " \
         "#{Colors::GRAY}[pid #{rand(1000..9999)}]#{Colors::RESET} " \
@@ -339,7 +338,7 @@ module DataSources
 
       def generate_startup_log
         timestamp = generate_apache_timestamp
-        
+
         startup_messages = [
           "Apache/2.4.41 (Ubuntu) configured -- resuming normal operations",
           "Server built: 2021-06-10T08:01:13",
@@ -348,7 +347,7 @@ module DataSources
           "Loaded DSO modules:",
           "Apache configured with worker MPM"
         ]
-        
+
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "#{Colors::GREEN}[mpm_prefork:notice]#{Colors::RESET} " \
         "#{Colors::GRAY}[pid #{rand(1000..9999)}]#{Colors::RESET} " \

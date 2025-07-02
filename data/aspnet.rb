@@ -197,11 +197,11 @@ module DataSources
         duration = LogUtils.random_duration(1.0, 500.0)
 
         [
-          format_log_line('Information', 'Microsoft.AspNetCore.Hosting.Diagnostics', 
+          format_log_line('Information', 'Microsoft.AspNetCore.Hosting.Diagnostics',
             "Request starting #{method} #{path} - -", request_id),
           rand < 0.3 ? format_log_line('Information', 'Microsoft.AspNetCore.Authorization.DefaultAuthorizationService',
             "Authorization was successful.", request_id) : nil,
-          format_log_line('Information', "MyApp.Controllers.#{controller}", 
+          format_log_line('Information', "MyApp.Controllers.#{controller}",
             "Executing action #{action}", request_id),
           rand < 0.5 ? generate_single_database_log(request_id) : nil,
           format_log_line('Information', "MyApp.Controllers.#{controller}",
@@ -219,7 +219,7 @@ module DataSources
       def generate_single_database_log(request_id = nil)
         query = sql_query
         duration = LogUtils.random_duration(0.5, 100.0)
-        
+
         format_log_line('Information', 'Microsoft.EntityFrameworkCore.Database.Command',
           "Executed DbCommand (#{duration}ms) [Parameters=[@p0='?', @p1='?'], CommandType='Text', CommandTimeout='30']\n      #{query}",
           request_id)
@@ -240,7 +240,7 @@ module DataSources
       def generate_error_logs
         exc = exception
         [
-          format_log_line('Error', "MyApp.Controllers.#{controller}", 
+          format_log_line('Error', "MyApp.Controllers.#{controller}",
             "An unhandled exception has occurred while executing the request.\n      #{exc}"),
           format_log_line('Debug', 'Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware',
             "   #{stack_trace_entry}"),
@@ -252,10 +252,10 @@ module DataSources
       def format_log_line(level, category, message, request_id = nil)
         level_color = LOG_LEVELS[level]
         timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
-        
+
         # Format: level: timestamp [RequestId?] Category[EventId] Message
         request_part = request_id ? "[#{request_id}] " : ""
-        
+
         "#{level_color}#{level.ljust(11)}#{Colors::RESET}: #{timestamp} #{request_part}#{Colors::CYAN}#{category}[0]#{Colors::RESET}\n      #{message}"
       end
     end
@@ -267,13 +267,13 @@ module LogUtils
   def self.weighted_sample(weights)
     total = weights.values.sum
     rand_num = rand * total
-    
+
     cumulative = 0
     weights.each do |item, weight|
       cumulative += weight
       return item if rand_num <= cumulative
     end
-    
+
     weights.keys.last
   end
 end

@@ -258,31 +258,31 @@ module DataSources
         status = status_code
         response_ms = response_time
         ip = LogUtils.ip_address
-        
+
         logs = []
-        
+
         # Morgan-style HTTP log
         logs << generate_morgan_log(method, path, status, response_ms, ip)
-        
+
         # Sometimes add detailed logs
         if rand < 0.3
           logs << generate_detailed_request_log(method, path)
         end
-        
+
         # Add response details for non-200 status
         if status >= 400
           logs << generate_error_response_log(status)
         end
-        
+
         logs
       end
 
       def generate_morgan_log(method, path, status, response_ms, ip)
         status_color = STATUS_CODE_COLORS[status] || Colors::RED
         method_color = method == 'GET' ? Colors::GREEN : Colors::YELLOW
-        
+
         timestamp = Time.now.strftime('%Y-%m-%d %H:%M:%S')
-        
+
         "#{Colors::GRAY}[#{timestamp}]#{Colors::RESET} " \
         "#{method_color}#{method}#{Colors::RESET} #{path} " \
         "#{status_color}#{status}#{Colors::RESET} " \
@@ -302,7 +302,7 @@ module DataSources
                else
                  'undefined'
                end
-        
+
         "#{level[:color]}[#{level[:label]}]#{Colors::RESET} " \
         "Request body: #{body}"
       end
@@ -318,7 +318,7 @@ module DataSources
                   when 500 then "Internal server error"
                   else "Request failed"
                   end
-        
+
         "#{level[:color]}[#{level[:label]}]#{Colors::RESET} #{message}"
       end
 
@@ -326,7 +326,7 @@ module DataSources
         operation = db_operation
         query = db_query
         duration = LogUtils.random_duration(0.5, 50.0)
-        
+
         case operation
         when 'Executing (default):'
           # Sequelize style
@@ -346,19 +346,19 @@ module DataSources
       def generate_error_logs
         error_type = self.error_type
         error_msg = error_message
-        
+
         logs = []
-        
+
         # Main error
         level = LOG_LEVELS[:error]
         logs << "#{level[:color]}[#{level[:label]}]#{Colors::RESET} " \
                 "#{Colors::RED}#{error_type}: #{error_msg}#{Colors::RESET}"
-        
+
         # Stack trace
         3.times do |i|
           logs << "#{Colors::GRAY}    at #{generate_stack_frame(i)}#{Colors::RESET}"
         end
-        
+
         logs
       end
 
@@ -377,7 +377,7 @@ module DataSources
       def generate_process_log
         level = LOG_LEVELS[:info]
         message = process_message
-        
+
         # Add some dynamic data to certain messages
         message = case message
                   when /Memory usage:/
@@ -389,7 +389,7 @@ module DataSources
                   else
                     message
                   end
-        
+
         "#{level[:color]}[#{level[:label]}]#{Colors::RESET} #{message}"
       end
 
@@ -403,7 +403,7 @@ module DataSources
           "Session created: #{SecureRandom.hex(16)}",
           "File uploaded: avatar_#{rand(1000)}.jpg (#{rand(100..5000)}KB)"
         ]
-        
+
         "#{level[:color]}[#{level[:label]}]#{Colors::RESET} #{messages.sample}"
       end
 
@@ -417,7 +417,7 @@ module DataSources
           "Failed to connect to Redis, using memory cache",
           "Large payload detected: #{rand(5..50)}MB"
         ]
-        
+
         "#{level[:color]}[#{level[:label]}]#{Colors::RESET} #{warnings.sample}"
       end
     end

@@ -7,7 +7,7 @@ module DataSources
   module Nginx
     # HTTP methods
     HTTP_METHODS = %w[GET POST PUT DELETE PATCH HEAD OPTIONS]
-    
+
     # Common paths and endpoints
     PATHS = [
       '/',
@@ -45,7 +45,7 @@ module DataSources
       '/test.php',
       '/phpinfo.php'
     ]
-    
+
     # HTTP status codes with weights
     STATUS_CODES = {
       200 => 0.60,  # OK - most common
@@ -66,7 +66,7 @@ module DataSources
       503 => 0.005, # Service Unavailable
       504 => 0.01   # Gateway Timeout
     }
-    
+
     # Status code colors
     STATUS_CODE_COLORS = {
       200 => Colors::GREEN,
@@ -87,7 +87,7 @@ module DataSources
       503 => Colors::RED,
       504 => Colors::RED
     }
-    
+
     # User agents
     USER_AGENTS = [
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -106,7 +106,7 @@ module DataSources
       'Go-http-client/1.1',
       '-' # Empty user agent
     ]
-    
+
     # Referrers
     REFERRERS = [
       '-',
@@ -122,7 +122,7 @@ module DataSources
       'http://localhost:3000/',
       'https://analytics.example.com/dashboard'
     ]
-    
+
     # Error log levels
     ERROR_LEVELS = {
       'debug' => { weight: 0.05, color: Colors::GRAY },
@@ -134,7 +134,7 @@ module DataSources
       'alert' => { weight: 0.015, color: Colors::BRIGHT_RED },
       'emerg' => { weight: 0.005, color: Colors::BRIGHT_MAGENTA }
     }
-    
+
     # Error messages by level
     ERROR_MESSAGES = {
       'debug' => [
@@ -194,7 +194,7 @@ module DataSources
         'configuration file %s test failed'
       ]
     }
-    
+
     # Upstream servers
     UPSTREAMS = [
       'backend_app',
@@ -205,7 +205,7 @@ module DataSources
       'payment_gateway',
       'search_cluster'
     ]
-    
+
     # Virtual hosts
     VHOSTS = [
       'example.com',
@@ -216,7 +216,7 @@ module DataSources
       'blog.example.com',
       'shop.example.com'
     ]
-    
+
     class << self
       def generate_log_entry
         # 80% access logs, 20% error logs
@@ -226,9 +226,9 @@ module DataSources
           generate_error_log
         end
       end
-      
+
       private
-      
+
       def generate_access_log
         ip = LogUtils.ip_address
         timestamp = Time.now.strftime('%d/%b/%Y:%H:%M:%S +0000')
@@ -241,7 +241,7 @@ module DataSources
         user_agent = USER_AGENTS.sample
         request_time = (rand * 2).round(3) # 0-2 seconds
         upstream_time = status >= 500 ? '-' : (rand * 1.5).round(3)
-        
+
         # Apply colors
         status_color = STATUS_CODE_COLORS[status] || Colors::RESET
         method_color = case method
@@ -251,23 +251,23 @@ module DataSources
                       when 'DELETE' then Colors::RED
                       else Colors::CYAN
                       end
-        
+
         # Nginx combined log format with additional fields
         # IP - - [timestamp] "METHOD /path HTTP/1.1" status bytes "referrer" "user-agent" request_time upstream_time
         "#{Colors::CYAN}#{ip}#{Colors::RESET} - - [#{timestamp}] \"#{method_color}#{method}#{Colors::RESET} #{path} #{protocol}\" #{status_color}#{status}#{Colors::RESET} #{bytes} \"#{referrer}\" \"#{user_agent}\" #{Colors::GRAY}#{request_time} #{upstream_time}#{Colors::RESET}"
       end
-      
+
       def generate_error_log
         timestamp = Time.now.strftime('%Y/%m/%d %H:%M:%S')
         level, level_info = weighted_error_level
         pid = rand(1000..65535)
         tid = rand(100..999)
         cid = rand(1000..9999)
-        
+
         # Get appropriate message for the level
         messages = ERROR_MESSAGES[level]
         message_template = messages.sample
-        
+
         # Fill in message template
         message = case message_template
                   when /%d/
@@ -306,7 +306,7 @@ module DataSources
                   else
                     message_template
                   end
-        
+
         # Add connection info for client-related errors
         client_info = if message.include?('client') || message.include?('*')
                        ", client: #{LogUtils.ip_address}, server: #{VHOSTS.sample}, request: \"#{HTTP_METHODS.sample} #{PATHS.sample} HTTP/1.1\""
@@ -315,36 +315,36 @@ module DataSources
                      else
                        ''
                      end
-        
+
         # Apply color to level
         level_color = level_info[:color]
-        
+
         # Nginx error log format
         # YYYY/MM/DD HH:MM:SS [level] PID#TID: *CID message
         "#{timestamp} [#{level_color}#{level}#{Colors::RESET}] #{pid}##{tid}: #{Colors::YELLOW}*#{cid}#{Colors::RESET} #{message}#{client_info}"
       end
-      
+
       def weighted_status_code
         rand_val = rand
         cumulative = 0
-        
+
         STATUS_CODES.each do |code, weight|
           cumulative += weight
           return code if rand_val <= cumulative
         end
-        
+
         200 # fallback
       end
-      
+
       def weighted_error_level
         rand_val = rand
         cumulative = 0
-        
+
         ERROR_LEVELS.each do |level, info|
           cumulative += info[:weight]
           return [level, info] if rand_val <= cumulative
         end
-        
+
         ['error', ERROR_LEVELS['error']] # fallback
       end
     end

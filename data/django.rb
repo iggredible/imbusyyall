@@ -241,76 +241,76 @@ module DataSources
         path = url_pattern
         status = status_code
         response_time = rand(10..500)
-        
+
         logs = []
-        
+
         # Django development server log
         timestamp = Time.now.strftime('[%d/%b/%Y %H:%M:%S]')
         status_color = STATUS_CODE_COLORS[status] || Colors::RED
-        
+
         logs << "#{Colors::GRAY}#{timestamp}#{Colors::RESET} " \
                 "\"#{method} #{path} HTTP/1.1\" " \
                 "#{status_color}#{status}#{Colors::RESET} " \
                 "#{rand(100..50000)}"
-        
+
         # Sometimes add debug info
         if rand < 0.2 && status >= 400
           logs << generate_traceback
         end
-        
+
         logs
       end
 
       def generate_database_logs
         query = sql_query
         duration = rand(0.5..100.0).round(3)
-        
+
         logs = []
-        
+
         # Django DB backend log
         level = LOG_LEVELS[:debug]
         logs << "#{Colors::GRAY}[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}]#{Colors::RESET} " \
                 "#{level[:color]}#{level[:django_label]}#{Colors::RESET} " \
                 "(#{duration}) #{Colors::BLUE}#{query}#{Colors::RESET}; args=#{generate_query_args}"
-        
+
         # Sometimes add EXPLAIN output
         if rand < 0.1 && query.start_with?('SELECT')
           logs << "#{Colors::GRAY}[EXPLAIN]#{Colors::RESET} Seq Scan on auth_user  (cost=0.00..1.52 rows=52 width=161)"
         end
-        
+
         logs
       end
 
       def generate_error_logs
         error = django_error
-        
+
         logs = []
-        
+
         # Main error log
         level = LOG_LEVELS[:error]
         logs << "#{Colors::RED}[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}]#{Colors::RESET} " \
                 "#{level[:color]}#{level[:django_label]}#{Colors::RESET} " \
                 "Internal Server Error: #{url_pattern}"
-        
+
         logs << "#{level[:color]}#{error}#{Colors::RESET}"
-        
+
         # Add traceback
         logs.concat(generate_django_traceback)
-        
+
         logs
       end
 
       def generate_cache_log
         operation = cache_operation
         level = LOG_LEVELS[:debug]
-        
+
         result = case operation
                  when /get/ then rand < 0.7 ? "HIT" : "MISS"
                  when /set/ then "STORED"
                  when /delete/ then "DELETED"
                  else "OK"
                  end
-        
+
         "#{Colors::GRAY}[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}]#{Colors::RESET} " \
         "#{level[:color]}django.core.cache#{Colors::RESET} " \
         "#{Colors::MAGENTA}#{operation}#{Colors::RESET} -> #{result}"
@@ -319,7 +319,7 @@ module DataSources
       def generate_celery_log
         task = celery_task
         task_id = SecureRandom.hex(16)
-        
+
         case rand(3)
         when 0
           # Task received
@@ -342,7 +342,7 @@ module DataSources
 
       def generate_management_log
         command = management_command
-        
+
         case command
         when 'migrate'
           "#{Colors::GREEN}Operations to perform:#{Colors::RESET}\n" \
@@ -364,7 +364,7 @@ module DataSources
 
       def generate_security_log
         level = LOG_LEVELS[:warning]
-        
+
         warnings = [
           "Forbidden (CSRF token missing or incorrect.): #{url_pattern}",
           "Forbidden (Origin checking failed - https://evil.com does not match any trusted origins.)",
@@ -372,7 +372,7 @@ module DataSources
           "Invalid HTTP_HOST header: '192.168.1.1'. You may need to add '192.168.1.1' to ALLOWED_HOSTS.",
           "UserWarning: A {% csrf_token %} was used in a template, but the context did not provide the value."
         ]
-        
+
         "#{Colors::YELLOW}[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}]#{Colors::RESET} " \
         "#{level[:color]}#{level[:django_label]}#{Colors::RESET} " \
         "#{warnings.sample}"
@@ -380,7 +380,7 @@ module DataSources
 
       def generate_traceback
         view = app_and_view
-        
+
         "Traceback (most recent call last):\n" \
         "  File \"/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py\", line 47, in inner\n" \
         "    response = get_response(request)\n" \
