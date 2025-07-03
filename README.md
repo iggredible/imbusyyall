@@ -2,9 +2,11 @@
 
 ## Fake Server Logs Generator 💻
 
-Generate colorized, realistic-looking Rails server logs for testing, demonstrations, or development environments.
+Generate colorized, realistic-looking server logs so people who walk by you think you're very busy and won't interrupt you! 🤫
 
 ![imbusyyall demo](https://private-user-images.githubusercontent.com/13905902/462181363-34fc81d2-47b6-47af-b9f3-4b185dd5c7d1.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTE1NzA4OTEsIm5iZiI6MTc1MTU3MDU5MSwicGF0aCI6Ii8xMzkwNTkwMi80NjIxODEzNjMtMzRmYzgxZDItNDdiNi00N2FmLWI5ZjMtNGIxODVkZDVjN2QxLmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA3MDMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNzAzVDE5MjMxMVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTcxYjAxYjBhMGJhZjFjZjcxMTVkOTUyZmUzNTkwM2UwODRhOWM3MmUzOThkN2U5ZWU4Mjc1MGY4OTNjMzViNjAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.b23fk4bFObs0V2Uqhwd3v20PryRJnIN6lKzkVEOF8Xk)
+
+## Credits / Inspiration
 
 *Inspired by [flog](https://github.com/mingrammer/flog/)*
 
