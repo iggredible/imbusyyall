@@ -1,4 +1,6 @@
-# imbusyyall - Rails Log Generator
+# imbusyyall
+
+## Fake Server Logs Generator 💻
 
 Generate colorized, realistic-looking Rails server logs for testing, demonstrations, or development environments.
 
