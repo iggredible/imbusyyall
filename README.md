@@ -10,7 +10,7 @@ Generate colorized, realistic-looking server logs so people who walk by you thin
 
 Inspired by:
 - [flog](https://github.com/mingrammer/flog/)
-- [Mission Impossible when Benji was playing Halo at work](https://www.youtube.com/watch?v=jg_PXNZrBds)
+- [Benji playing Halo in Mission Impossible](https://www.youtube.com/watch?v=jg_PXNZrBds)
 
 ## Installation
 
