@@ -50,6 +50,9 @@ class LogGenerator
   class << self
     def load_data(source)
       case source
+      when :sample
+        require_relative 'data/sample'
+        DataSources::Sample
       when :rails
         require_relative 'data/rails'
         DataSources::Rails

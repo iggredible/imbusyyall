@@ -13,7 +13,7 @@ Generate colorized, realistic-looking server logs for various frameworks and pla
 - ⏱ **Simulated performance metrics** with realistic timing
 - 🧩 **Cache operations** and database interactions
 - ❌ **Error states and exceptions** with proper stack traces
-- 🏃‍♂️ **Adjustable output speed** for presentations or testing
+- 🏃 **Adjustable output speed** for presentations or testing
 - ♾️ **Infinite mode** for continuous log generation
 - 🎯 **Modular architecture** for easy extension
 
@@ -249,21 +249,6 @@ MIT
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## Changelog
-
-### v2.0.0
-- Added support for multiple frameworks (Node.js, Django, Apache)
-- Refactored to modular architecture
-- Added data source selection with `-d` option
-- Improved color schemes for each framework
-- Enhanced realistic log patterns
-
-### v1.0.0
-- Initial Rails-only version
-- Basic log generation with colorization
-- Infinite mode support
-- Adjustable timing
 
 ## Credits
 
