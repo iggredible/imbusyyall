@@ -184,26 +184,26 @@ module DataSources
       def weighted_log_level
         total_weight = LOG_LEVELS.values.sum { |v| v[:weight] }
         random = rand(total_weight)
-        
+
         cumulative = 0
         LOG_LEVELS.each do |level, config|
           cumulative += config[:weight]
           return level if random < cumulative
         end
-        
+
         'INFO' # fallback
       end
 
       def weighted_status_code
         total_weight = STATUS_CODES.values.sum { |v| v[:weight] }
         random = rand(total_weight)
-        
+
         cumulative = 0
         STATUS_CODES.each do |code, config|
           cumulative += config[:weight]
           return code if random < cumulative
         end
-        
+
         200 # fallback
       end
 
@@ -213,7 +213,7 @@ module DataSources
       end
 
       def format_thread
-        threads = ['http-nio-8080-exec-1', 'http-nio-8080-exec-2', 'http-nio-8080-exec-3', 
+        threads = ['http-nio-8080-exec-1', 'http-nio-8080-exec-2', 'http-nio-8080-exec-3',
                   'http-nio-8080-exec-4', 'http-nio-8080-exec-5', 'http-nio-8080-exec-6',
                   'scheduling-1', 'task-1', 'task-2', 'kafka-listener-1', 'async-1']
         threads.sample
@@ -225,10 +225,10 @@ module DataSources
         path = endpoint[:path].gsub('{id}', rand(1..10000).to_s)
         status = weighted_status_code
         duration = rand(5..500)
-        
+
         level = status >= 500 ? 'ERROR' : (status >= 400 ? 'WARN' : 'INFO')
         level_color = LOG_LEVELS[level][:color]
-        
+
         # Spring Boot request logging format
         "#{format_timestamp} #{level_color}#{level.ljust(5)}#{Colors::RESET} [#{format_thread}] " \
         "#{Colors::CYAN}com.example.api.filter.RequestLoggingFilter#{Colors::RESET} : " \
@@ -238,13 +238,13 @@ module DataSources
       def generate_sql_log
         query = SQL_QUERIES.sample
         duration = rand(1..100)
-        
+
         logs = []
-        
+
         # Hibernate SQL logging
         logs << "#{format_timestamp} #{Colors::CYAN}DEBUG#{Colors::RESET} [#{format_thread}] " \
                 "#{Colors::CYAN}org.hibernate.SQL#{Colors::RESET} : #{query}"
-        
+
         # Sometimes add parameter binding logs
         if rand < 0.5
           param_count = query.scan(/\?/).count
@@ -254,13 +254,13 @@ module DataSources
                    when 1 then rand(1..10000)
                    else "'2024-01-15 10:30:00'"
                    end
-            
+
             logs << "#{format_timestamp} #{Colors::GRAY}TRACE#{Colors::RESET} [#{format_thread}] " \
                     "#{Colors::GRAY}org.hibernate.type.descriptor.sql.BasicBinder#{Colors::RESET} : " \
                     "binding parameter [#{i + 1}] as [#{%w[VARCHAR BIGINT TIMESTAMP].sample}] - [#{value}]"
           end
         end
-        
+
         # Sometimes add statistics
         if rand < 0.3
           logs << "#{format_timestamp} #{Colors::GREEN}INFO#{Colors::RESET}  [#{format_thread}] " \
@@ -269,13 +269,13 @@ module DataSources
                   "#{rand(1000)}00 nanoseconds spent releasing #{rand(1..3)} JDBC connections; " \
                   "#{rand(10000)}00 nanoseconds spent preparing #{rand(1..10)} JDBC statements; }"
         end
-        
+
         logs.join("\n")
       end
 
       def generate_application_log
         event = APP_EVENTS.sample
-        
+
         # Most app events are INFO level
         "#{format_timestamp} #{Colors::GREEN}INFO#{Colors::RESET}  [main] " \
         "#{Colors::GREEN}com.example.api.Application#{Colors::RESET} : #{event}"
@@ -294,25 +294,25 @@ module DataSources
           { logger: 'CacheService', message: "Cache hit for key: user:#{rand(1000)}:profile" },
           { logger: 'CacheService', message: "Evicting cache entries for pattern: product:*" }
         ]
-        
+
         service = services.sample
         level = weighted_log_level
         level_color = LOG_LEVELS[level][:color]
-        
+
         "#{format_timestamp} #{level_color}#{level.ljust(5)}#{Colors::RESET} [#{format_thread}] " \
         "#{level_color}com.example.api.service.#{service[:logger]}#{Colors::RESET} : #{service[:message]}"
       end
 
       def generate_exception_log
         exception = EXCEPTIONS.sample
-        
+
         logs = []
-        
+
         # Main error message
         logs << "#{format_timestamp} #{Colors::BRIGHT_RED}ERROR#{Colors::RESET} [#{format_thread}] " \
                 "#{Colors::BRIGHT_RED}com.example.api.exception.GlobalExceptionHandler#{Colors::RESET} : " \
                 "Handling exception: #{exception[:type]}: #{exception[:message]}"
-        
+
         # Stack trace
         logs << "#{exception[:type]}: #{exception[:message]}"
         logs << "\tat com.example.api.service.UserService.findById(UserService.java:#{rand(50..200)})"
@@ -321,32 +321,32 @@ module DataSources
         logs << "\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:#{rand(200..300)})"
         logs << "\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:#{rand(100..200)})"
         logs << "\t... #{rand(20..50)} more"
-        
+
         logs.join("\n")
       end
 
       def generate_framework_log
         frameworks = [
-          { logger: 'org.springframework.web.servlet.DispatcherServlet', 
+          { logger: 'org.springframework.web.servlet.DispatcherServlet',
             message: "Completed initialization in #{rand(100..1000)} ms" },
-          { logger: 'org.springframework.data.repository.config.RepositoryConfigurationDelegate', 
+          { logger: 'org.springframework.data.repository.config.RepositoryConfigurationDelegate',
             message: "Bootstrapping Spring Data JPA repositories in DEFAULT mode." },
-          { logger: 'org.springframework.security.web.DefaultSecurityFilterChain', 
+          { logger: 'org.springframework.security.web.DefaultSecurityFilterChain',
             message: "Will secure any request with #{rand(10..15)} filters" },
-          { logger: 'org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver', 
+          { logger: 'org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver',
             message: "Exposing #{rand(10..20)} endpoint(s) beneath base path '/actuator'" },
-          { logger: 'org.springframework.kafka.listener.KafkaMessageListenerContainer', 
+          { logger: 'org.springframework.kafka.listener.KafkaMessageListenerContainer',
             message: "partitions assigned: [user-events-0, user-events-1]" },
-          { logger: 'org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor', 
+          { logger: 'org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor',
             message: "Initializing ExecutorService 'applicationTaskExecutor'" },
-          { logger: 'com.zaxxer.hikari.HikariDataSource', 
+          { logger: 'com.zaxxer.hikari.HikariDataSource',
             message: "HikariPool-1 - Starting..." },
-          { logger: 'org.springframework.cache.interceptor.CacheInterceptor', 
+          { logger: 'org.springframework.cache.interceptor.CacheInterceptor',
             message: "Cache entry for key 'product:#{rand(1000)}' found in cache 'products'" }
         ]
-        
+
         framework = frameworks.sample
-        
+
         "#{format_timestamp} #{Colors::GREEN}INFO#{Colors::RESET}  [#{format_thread}] " \
         "#{Colors::GREEN}#{framework[:logger]}#{Colors::RESET} : #{framework[:message]}"
       end
@@ -360,7 +360,7 @@ module DataSources
           "Cache statistics: hits=#{rand(1000..10000)}, misses=#{rand(100..1000)}, hit-ratio=#{rand(70..95)}%",
           "JVM memory: heap=#{rand(200..800)}MB/1024MB, non-heap=#{rand(50..150)}MB"
         ]
-        
+
         "#{format_timestamp} #{Colors::GREEN}INFO#{Colors::RESET}  [metrics-logger] " \
         "#{Colors::GREEN}com.example.api.monitoring.PerformanceMonitor#{Colors::RESET} : #{metrics.sample}"
       end
@@ -376,10 +376,10 @@ module DataSources
           "CORS request from origin: https://example.com - Allowed",
           "Suspicious activity detected: Multiple failed login attempts from IP: #{LogUtils.ip_address}"
         ]
-        
+
         level = events.last.include?('Failed') || events.last.include?('denied') ? 'WARN' : 'INFO'
         level_color = LOG_LEVELS[level][:color]
-        
+
         "#{format_timestamp} #{level_color}#{level.ljust(5)}#{Colors::RESET} [#{format_thread}] " \
         "#{level_color}com.example.api.security.SecurityEventLogger#{Colors::RESET} : #{events.sample}"
       end
