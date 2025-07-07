@@ -14,12 +14,20 @@ Inspired by:
 
 ## Installation
 
+### Manual Installation
+
 Simply download the script and make it executable:
 
 ```bash
 git clone https://github.com/yourusername/imbusyyall.git
 cd imbusyyall
 chmod +x imbusyyall.rb
+```
+### Using Homebrew
+
+```bash
+brew tap iggredible/imbusyyall
+brew install imbusyyall
 ```
 
 ## Requirements
