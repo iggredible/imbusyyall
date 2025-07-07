@@ -23,6 +23,16 @@ git clone https://github.com/yourusername/imbusyyall.git
 cd imbusyyall
 chmod +x imbusyyall.rb
 ```
+
+To use `imbusyyall` as a command from anywhere (without `./`), add it to your PATH:
+
+```bash
+# Add the current directory to PATH (add to ~/.bashrc or ~/.zshrc)
+echo 'export PATH="$PATH:'$(pwd)'"' >> ~/.bashrc  # for bash
+echo 'export PATH="$PATH:'$(pwd)'"' >> ~/.zshrc   # for zsh
+source ~/.bashrc  # or source ~/.zshrc
+```
+
 ### Using Homebrew
 
 ```bash
@@ -49,25 +59,25 @@ Options:
 
 ```console
 # Generate 1000 lines of Rails logs to stdout
-$ ./imbusyyall.rb
+$ imbusyyall
 
 # Generate 500 lines of logs with a 1 second delay between each line
-$ ./imbusyyall.rb -l 500 -s 1
+$ imbusyyall -l 500 -s 1
 
 # Generate logs infinitely with minimal delay (1ms)
-$ ./imbusyyall.rb -l INFINITY -s 0.001
+$ imbusyyall -l INFINITY -s 0.001
 
 # Generate Node.js logs
-$ ./imbusyyall.rb -d node -l 2000
+$ imbusyyall -d node -l 2000
 
 # Generate Django logs with slow output for demos
-$ ./imbusyyall.rb -d django -s 1
+$ imbusyyall -d django -s 1
 
 # Generate Apache logs infinitely
-$ ./imbusyyall.rb -d apache -l INFINITY
+$ imbusyyall -d apache -l INFINITY
 
 # Save colorized output to a file
-$ ./imbusyyall.rb -l 2000 > rails.log
+$ imbusyyall -l 2000 > rails.log
 
 # View saved logs with colors preserved
 $ less -R rails.log
